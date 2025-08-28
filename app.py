@@ -1,10 +1,14 @@
 import streamlit as st
 import zipfile
 import pandas as pd
-import utils
+import altair as alt
+
+def removeLeadingQuotations(title):
+    """Remove leading quotation marks from a title string."""
+    return title.strip('"').strip("'")
 
 st.title("Reddit Climate Change Topic Visualizer")
-st.write("This app visualizes topics from Reddit posts about climate change over time.")
+st.write("This app visualizes topics from Reddit posts about climate change over time. You can also see the distribution of subreddits where a certain topic(s) was posted.")
 
 @st.cache_data
 def load_data(path):
@@ -17,7 +21,7 @@ topic_info = load_data("data/topic_info.csv")
 st.header("Prevalence of topics over time")
 
 df_100k['Date'] = pd.to_datetime(df_100k['created_utc'], unit='s') # convert to datetime
-topic_info['Title'] = topic_info['Title'].apply(utils.removeLeadingQuotations) # clean titles
+topic_info['Title'] = topic_info['Title'].apply(removeLeadingQuotations) # clean titles
 df_vis = df_100k[df_100k['Topic'] != -1].copy()                    # filter out noise topic
 df_vis['Month'] = df_vis['Date'].dt.to_period('M').dt.to_timestamp() # extract month
 df_vis = df_vis.merge(
@@ -25,13 +29,9 @@ df_vis = df_vis.merge(
     on='Topic',
     how='left'                    
 )
-
-st.write(topic_info['Title'].head())
-
 all_topics = topic_info['Title'].unique().tolist()[1:]
 
-selected_topics = st.multiselect(
-    "Select topics to display",
+selected_topics = st.multiselect("Select topics to include",
     options=all_topics,
     default=all_topics, key='multiselect1'
 )
@@ -51,12 +51,15 @@ st.area_chart(
 st.divider()
 st.header("Subreddit distribution of topics")
 
-selected_topics2 = st.multiselect(
-    "Select topics to display",
+selected_topics2 = st.multiselect("Select topics to include",
     options=all_topics,
     default=all_topics, key='multiselect2')
-subreddit_dist = df_vis[df_vis['Title'].isin(selected_topics2)]['subreddit.name'].value_counts()
-st.write(subreddit_dist).head(20)
-st.bar_chart(subreddit_dist)
 
-# TODO: FIX ORDER OF TOPICS, CONTROL ALLOWED SCROLLING BEHAVIOR, ADD MORE CHARTS (SUBREDDIT ETC)
+filtered_df = df_vis[df_vis['Title'].isin(selected_topics2)]
+subreddit_dist = filtered_df['subreddit.name'].dropna().value_counts().head(30).reset_index()
+subreddit_dist.columns = ['subreddit name', 'posts']
+subreddit_dist['subreddit name'] = subreddit_dist['subreddit name'].apply(lambda x: 'r/' + x)
+subreddit_dist = subreddit_dist.sort_values('posts', ascending=False)
+
+chart = alt.Chart(subreddit_dist).mark_bar().encode(x=alt.X("subreddit name", sort=None), y="posts")
+st.altair_chart(chart, use_container_width=True)
