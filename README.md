@@ -1,5 +1,7 @@
 Data originally from https://www.kaggle.com/datasets/pavellexyr/the-reddit-climate-change-dataset?resource=download
 
+### Setup
+
 This app requires Streamlit, pandas, and Altair, which you can download with 
 ```bash
 pip install streamlit pandas altair
@@ -14,5 +16,5 @@ streamlit run app.py
 
 Also in progress is a demo video if you want to see how the project works without downloading the files.
 
-### Process (which you can see in the Jupyter Notebook):
+### Process (which you can see for yourself in the Jupyter Notebook):
 1. Dealing with original dataset. Keeping only relevant columns, combining titles and datasets, later on taking a sample of 100k posts out of the original 600k+ for faster computation.
