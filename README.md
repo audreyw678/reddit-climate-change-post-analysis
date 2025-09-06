@@ -8,7 +8,7 @@ This app requires Streamlit, pandas, and Altair, which you can download with
 pip install streamlit pandas altair
 ```
 
-You will also have to download the Reddit post data and topic data, which are too large to attach to the GitHub repository. You can download them here and move them to the repository manually. A Python script that automates this is in progress. Ensure that the name of the data folder remains "data" after downloading.
+You will also have to download the Reddit post data and topic data, which are too large to attach to the GitHub repository. You can download them here (https://drive.google.com/drive/folders/19WSP47EL7DWYMSirMdq1erYLIT-tX0Ev?usp=sharing) and move them to the repository manually. A Python script that automates this is in progress. Ensure that the name of the data folder remains "data" after downloading.
 
 You can then run the app with
 ```bash
